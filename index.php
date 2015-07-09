@@ -15,6 +15,10 @@ try {
             str_replace("<br/>", "\n", json_decode('"' . $result[1][0] . '"')));
     }
 
+    if (in_array($incomingMessage->getText(), ['/qaanswer'])) {
+        $bot->sendMessage($incomingMessage->getChat()->getId(), file_get_contents('http://qaanswers.ru/qwe.php'));
+    }
+
 } catch(\TelegramBot\Api\Exception $e) {
     echo $e->getMessage();
 }
