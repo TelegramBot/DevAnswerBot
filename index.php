@@ -3,23 +3,22 @@
 require_once "vendor/autoload.php";
 
 try {
-    $json = json_decode(file_get_contents("php://input"), true);
-    $bot = new \TelegramBot\Api\BotApi('115769512:AAHrmO74I84DrmGmAezMBqS-vkQfhiU6fH0');
+    $bot = new \TelegramBot\Api\Client('YOUR_BOT_API_TOKEN', 'YOUR_BOTAN_TRACKER_API_KEY');
 
-    $incomingMessage = \TelegramBot\Api\Types\Message::fromResponse($json['message']);
-
-    if (in_array($incomingMessage->getText(), ['/devanswer'])) {
+    $bot->command('devanswer', function ($message) use ($bot) {
         preg_match_all('/{"text":"(.*?)",/s', file_get_contents('http://devanswers.ru/'), $result);
 
-        $bot->sendMessage($incomingMessage->getChat()->getId(),
+        $bot->sendMessage($message->getChat()->getId(),
             str_replace("<br/>", "\n", json_decode('"' . $result[1][0] . '"')));
-    }
+    });
 
-    if (in_array($incomingMessage->getText(), ['/qaanswer'])) {
-        $bot->sendMessage($incomingMessage->getChat()->getId(), file_get_contents('http://qaanswers.ru/qwe.php'));
-    }
+    $bot->command('qaanswer', function ($message) use ($bot) {
+        $bot->sendMessage($message->getChat()->getId(), file_get_contents('http://qaanswers.ru/qwe.php'));
+    });
 
-} catch(\TelegramBot\Api\Exception $e) {
-    echo $e->getMessage();
+    $bot->run();
+
+
+} catch (\TelegramBot\Api\Exception $e) {
+    $e->getMessage();
 }
-
